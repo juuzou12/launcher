@@ -19,20 +19,49 @@ class MainActivity: FlutterActivity() {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "download") {
-                result.success(onDownloadComplete)
-            } else {
-                result.notImplemented()
+                result.success(boardcastFunction())
             }
         }
     }
-    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            //Fetching the download id received with the broadcast
-            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            //Checking if the received broadcast is for our enqueued download by matching download id
-            Toast.makeText(this@MainActivity, "Download Completed", Toast.LENGTH_SHORT).show()
+
+    fun boardcastFunction(){
+        val br: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                println("action is " + intent.action)
+                if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
+                    val packageName = intent.data.toString()
+                    val packageManager = context.packageManager
+                    var packageInfo: PackageInfo? = null
+                    println("package removed")
+                    try {
+                        packageInfo = packageManager.getPackageInfo(packageName, 0)
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        e.printStackTrace()
+                    }
+                    assert(packageInfo != null)
+                    Log.v("debug", packageInfo!!.versionName)
+                }
+                else if (intent.action == Intent.ACTION_PACKAGE_FULLY_REMOVED) {
+                    val packageName = intent.data.toString().substring(8)
+                    println("package removed $packageName")
+                    //TODO update in UI
+                    addAppsToUI()
+                }
+                else if (intent.action == Intent.ACTION_PACKAGE_ADDED) {
+                    //String packageName = intent.getData().toString().substring(8);
+                    println("package added ")
+                    //TODO update in UI
+                    addAppsToUI()
+                }
+
+                else if (intent.action == Intent.ACTION_PACKAGE_INSTALL) {
+                    println("package installed")
+                    //TODO update in UI
+                }else if(intent.action=="com.example.action.SEND_APP_INFO_TO_LAUNCHER"){
+                    println("intent received")
+                }
+            }
         }
     }
-
 
 }

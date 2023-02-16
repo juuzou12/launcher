@@ -37,8 +37,8 @@ class Launcher extends GetView<LauncherController> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: GridView.builder(
-                    shrinkWrap: true,
+                  child: Obx(() => GridView.builder(
+                      shrinkWrap: true,
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3, crossAxisSpacing: 8.0),
                       itemCount: controller.apps.length,
@@ -63,7 +63,7 @@ class Launcher extends GetView<LauncherController> {
                               );
                             }
                         );
-                      }),
+                      })),
                 ),
               ),
             )
